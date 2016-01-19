@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.html.parser.Entity;
 import java.io.BufferedReader;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Wifi 探针 接收API
@@ -28,12 +26,16 @@ public class TrackerController {
     @Autowired
     TrackerService service;
 
-    private String mustArg(HashMap body, String name, String remark) {
-        Object value = body.get(name);
-        if (value == null) {
-            throw new ServiceException("缺少参数：" + name + "：" + remark);
+    private String mustArg(HashMap body, String remark, String... names) {
+        Set<Map.Entry> set = body.entrySet();
+        for (String name : names) {
+            for (Map.Entry entity : set) {
+                if (name.equalsIgnoreCase(entity.getKey().toString())) {
+                    return entity.getValue().toString();
+                }
+            }
         }
-        return value.toString();
+        throw new ServiceException("缺少参数：" + names[0] + "：" + remark);
     }
 
     /**
